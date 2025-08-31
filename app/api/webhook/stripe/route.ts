@@ -4,7 +4,8 @@ export const dynamic = 'force-dynamic';
 import Stripe from 'stripe';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '../../../../lib/supabase-server'; // from app/api/webhook/stripe
+import { supabaseAdmin } from '../../../lib/supabase-server';
+ // from app/api/webhook/stripe
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
