@@ -1,0 +1,12 @@
+{
+  "/_not-found": "app/_not-found.js",
+  "/api/portal/route": "app/api/portal/route.js",
+  "/api/checkout/route": "app/api/checkout/route.js",
+  "/app/dashboard/page": "app/app/dashboard/page.js",
+  "/app/portal/page": "app/app/portal/page.js",
+  "/page": "app/page.js",
+  "/login/page": "app/login/page.js",
+  "/pricing/page": "app/pricing/page.js",
+  "/api/webhook/stripe/route": "app/api/webhook/stripe/route.js",
+  "/api/webhook/route": "app/api/webhook/route.js"
+}
