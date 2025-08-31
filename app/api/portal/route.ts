@@ -1,32 +1,27 @@
-export const runtime = 'nodejs';
-
-import Stripe from 'stripe';
 import { NextResponse } from 'next/server';
+import Stripe from 'stripe';
 
-// Initialize Stripe here (no shared helper, no apiVersion pin)
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2024-06-20' as any,
+});
 
-/**
- * POST /api/portal
- * Body options:
- *   { customerId?: string, returnUrl?: string }
- * You should pass the Stripe customer ID from your DB/session.
- */
 export async function POST(req: Request) {
   try {
-    const { customerId, returnUrl } = await req.json().catch(() => ({}));
+    const body = await req.json();
+    const customerId = body.customerId as string;
 
     if (!customerId) {
       return NextResponse.json({ error: 'Missing customerId' }, { status: 400 });
     }
 
-    const session = await stripe.billingPortal.sessions.create({
+    const portalSession = await stripe.billingPortal.sessions.create({
       customer: customerId,
-      return_url: returnUrl ?? `${process.env.NEXT_PUBLIC_APP_URL}/app/dashboard`,
+      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/app/dashboard`,
     });
 
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ url: portalSession.url });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message ?? 'Portal error' }, { status: 500 });
+    console.error('Portal route error:', err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
