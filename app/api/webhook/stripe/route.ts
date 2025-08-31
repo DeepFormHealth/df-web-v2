@@ -1,12 +1,11 @@
 export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic'; // avoids static optimization
+export const dynamic = 'force-dynamic';
 
 import Stripe from 'stripe';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '../../../../lib/supabase-server'; // relative path from here
+import { supabaseAdmin } from '../../../../lib/supabase-server'; // from app/api/webhook/stripe
 
-// Initialize Stripe (use account default API version)
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: Request) {
@@ -21,10 +20,7 @@ export async function POST(req: Request) {
   try {
     event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
   } catch (err: any) {
-    return NextResponse.json(
-      { error: `Signature verification failed: ${err.message}` },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: `Signature verification failed: ${err.message}` }, { status: 400 });
   }
 
   const supabase = supabaseAdmin();
@@ -49,4 +45,18 @@ export async function POST(req: Request) {
 
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
-        // Optionally insert c
+        // optional: persist checkout/session info
+        break;
+      }
+
+      default:
+        // ignore others
+        break;
+    }
+
+    return NextResponse.json({ received: true });
+  } catch (err) {
+    console.error('Webhook handler error:', err);
+    return NextResponse.json({ error: 'Handler failed' }, { status: 500 });
+  }
+}
